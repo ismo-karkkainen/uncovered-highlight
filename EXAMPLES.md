@@ -15,14 +15,14 @@ NODE_V8_COVERAGE=coverage npm test
 ### View Coverage for a Single File
 
 ```bash
-# Basic usage
+# Basic usage (shows "..." for gaps by default)
 uncovered-highlight src/myfile.ts
 
 # With line numbers
 uncovered-highlight --line-numbers src/myfile.ts
 
-# Show gaps with "..." indicators
-uncovered-highlight --line-numbers --show-omitted src/myfile.ts
+# Disable "..." indicators
+uncovered-highlight --no-show-omitted src/myfile.ts
 ```
 
 ### Adjust Context Lines
@@ -41,13 +41,13 @@ uncovered-highlight --context 5 src/myfile.ts
 ### Color Modes
 
 ```bash
-# Dark mode (default) - white text, red highlight
+# Dark mode (default) - red text for uncovered code
 uncovered-highlight src/myfile.ts
 
-# Light mode - black text, red highlight
+# Light mode - red text for uncovered code (same as dark)
 uncovered-highlight --color light src/myfile.ts
 
-# Bold mode - normal text, bold for uncovered
+# Bold mode - bold text for uncovered code
 uncovered-highlight --color bold src/myfile.ts
 ```
 
@@ -67,7 +67,8 @@ uncovered-highlight --line-numbers --show-omitted src/*.ts
 ### Custom Directories
 
 ```bash
-# Specify custom coverage directory
+# Coverage directory is auto-detected from source file location
+# But you can override it:
 uncovered-highlight --coverage-dir ./my-coverage src/myfile.ts
 
 # Specify custom TypeScript output directory
@@ -75,6 +76,9 @@ uncovered-highlight --out-dir ./build src/myfile.ts
 
 # Both together
 uncovered-highlight --coverage-dir ./cov --out-dir ./dist src/myfile.ts
+
+# Works from any directory - will find coverage/ or tsconfig.json in parent directories
+cd src/subdir && uncovered-highlight myfile.ts
 ```
 
 ## Programmatic Usage

@@ -25,13 +25,13 @@ interface CliOptions {
 class CoverageHighlightCli {
   private colorSchemes: Record<string, ColorScheme> = {
     dark: {
-      text: '\x1b[37m',
-      highlight: '\x1b[101m',
+      text: '\x1b[0m',
+      highlight: '\x1b[31m',
       reset: '\x1b[0m'
     },
     light: {
-      text: '\x1b[30m',
-      highlight: '\x1b[41m',
+      text: '\x1b[0m',
+      highlight: '\x1b[31m',
       reset: '\x1b[0m'
     },
     bold: {
@@ -49,7 +49,21 @@ class CoverageHighlightCli {
       process.exit(1);
     }
 
-    const coverageDir = options.coverageDir || 'coverage';
+    let coverageDir = options.coverageDir;
+
+    if (!coverageDir) {
+      if (options.files.length > 0) {
+        const foundDir = this.findCoverageDir(options.files[0]);
+        if (foundDir) {
+          coverageDir = foundDir;
+        } else {
+          coverageDir = 'coverage';
+        }
+      } else {
+        coverageDir = 'coverage';
+      }
+    }
+
     if (!fs.existsSync(coverageDir)) {
       console.error(`Coverage directory not found: ${coverageDir}`);
       process.exit(1);
@@ -198,6 +212,22 @@ class CoverageHighlightCli {
     return null;
   }
 
+  private findCoverageDir(filePath: string): string | null {
+    let currentDir = path.dirname(path.resolve(filePath));
+
+    while (currentDir !== path.dirname(currentDir)) {
+      const coverageDir = path.join(currentDir, 'coverage');
+
+      if (fs.existsSync(coverageDir) && fs.statSync(coverageDir).isDirectory()) {
+        return coverageDir;
+      }
+
+      currentDir = path.dirname(currentDir);
+    }
+
+    return null;
+  }
+
   private displayHighlights(
     filePath: string,
     lineHighlights: LineHighlight[],
@@ -255,7 +285,7 @@ class CoverageHighlightCli {
     const options: CliOptions = {
       showLineNumbers: false,
       contextLines: 2,
-      showOmitted: false,
+      showOmitted: true,
       colorMode: 'dark',
       files: []
     };
@@ -273,6 +303,8 @@ class CoverageHighlightCli {
         options.contextLines = parseInt(args[++i], 10);
       } else if (arg === '--show-omitted') {
         options.showOmitted = true;
+      } else if (arg === '--no-show-omitted') {
+        options.showOmitted = false;
       } else if (arg === '--color' && i + 1 < args.length) {
         const mode = args[++i];
         if (mode === 'dark' || mode === 'light' || mode === 'bold') {
@@ -294,18 +326,20 @@ class CoverageHighlightCli {
 Usage: uncovered-highlight [options] <file...>
 
 Options:
-  --coverage-dir <dir>   Coverage data directory (default: coverage)
+  --coverage-dir <dir>   Coverage data directory (default: auto-detected)
   --out-dir <dir>        TypeScript output directory (overrides tsconfig.json)
   --line-numbers         Show line numbers
   --context <n>          Number of context lines around uncovered code (default: 2)
-  --show-omitted         Show "..." for omitted lines
-  --color <mode>         Color mode: dark, light, or bold (default: dark)
+  --show-omitted         Show "..." for omitted lines (default: on)
+  --no-show-omitted      Disable showing "..." for omitted lines
+  --color <mode>         Color mode: dark (red text), light (red text), or bold (default: dark)
   -h, --help             Show this help message
 
 Examples:
   uncovered-highlight src/file.ts
-  uncovered-highlight --line-numbers --show-omitted src/file.ts
-  uncovered-highlight --color light --context 3 src/*.ts
+  uncovered-highlight --line-numbers src/file.ts
+  uncovered-highlight --color bold --context 3 src/*.ts
+  uncovered-highlight --no-show-omitted src/file.ts
     `);
   }
 }

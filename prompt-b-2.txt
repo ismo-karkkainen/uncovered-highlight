@@ -1,0 +1,7 @@
+The testprogs coverage directory should be in testprogs/coverage since that is where the tsconfig.json and others are. The testprogs should look like a package top-level directory.
+
+If I pass a source file with path, the tsconfig.json or coverage directory should be searched from that path to make the tool more convenient to use. Granted, common usage is to run the tool at the package directory, but still.
+
+The red background of highlight is too strong. Modify highlighting so that highlighted text is red or bold, and text background stays unchanged. Also make the show-omitted be true by default. Clearer that way.
+
+In case I pack the package, *.tgz should be ignored by git.

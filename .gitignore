@@ -1,6 +1,8 @@
 node_modules/
 dist/
 coverage/
+testprogs/coverage/
 *.log
+*.tgz
 .DS_Store
 testprogs/dist/

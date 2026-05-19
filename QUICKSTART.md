@@ -23,11 +23,14 @@ npx uncovered-highlight src/your-file.ts
 ### 3. Customize (Optional)
 
 ```bash
-# With line numbers and omitted line markers
-npx uncovered-highlight --line-numbers --show-omitted src/your-file.ts
+# With line numbers (omitted line markers are on by default)
+npx uncovered-highlight --line-numbers src/your-file.ts
 
-# Light color scheme
+# Light color scheme (red text instead of default red text)
 npx uncovered-highlight --color light src/your-file.ts
+
+# Bold text instead of red
+npx uncovered-highlight --color bold src/your-file.ts
 
 # Only show uncovered lines (no context)
 npx uncovered-highlight --context 0 src/your-file.ts
@@ -77,11 +80,11 @@ The tool automatically finds the compiled JavaScript and source maps!
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--coverage-dir <dir>` | Coverage data location | `coverage` |
+| `--coverage-dir <dir>` | Coverage data location | Auto-detected or `coverage` |
 | `--out-dir <dir>` | TypeScript output (overrides tsconfig) | From tsconfig.json |
 | `--line-numbers` | Show line numbers | Off |
 | `--context <n>` | Context lines around uncovered | `2` |
-| `--show-omitted` | Show "..." for gaps | Off |
+| `--show-omitted` | Show "..." for gaps | On |
 | `--color <mode>` | `dark`, `light`, or `bold` | `dark` |
 
 ## Troubleshooting

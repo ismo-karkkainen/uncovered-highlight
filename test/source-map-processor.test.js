@@ -9,7 +9,7 @@ describe('SourceMapProcessor', function() {
   let processor;
 
   before(function() {
-    const coverageDir = path.join(__dirname, '..', 'coverage');
+    const coverageDir = path.join(__dirname, '..', 'testprogs', 'coverage');
     reader = new V8CoverageReader(coverageDir);
     processor = new SourceMapProcessor();
   });
