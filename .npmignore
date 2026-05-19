@@ -1,0 +1,27 @@
+# Source files
+src/
+tsconfig.json
+
+# Tests
+test/
+.mocharc.json
+
+# Test programs
+testprogs/
+
+# Coverage data
+coverage/
+
+# Build artifacts
+*.log
+*.tgz
+
+# Development files
+.git/
+.gitignore
+.claude/
+
+# Documentation for development
+IMPLEMENTATION.md
+prompt-b-1.txt
+example/

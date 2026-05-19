@@ -1,0 +1,37 @@
+{
+  "name": "uncovered-highlight",
+  "version": "1.0.0",
+  "description": "A package and tool to display source code with uncovered parts highlighted",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "uncovered-highlight": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "mocha",
+    "prepublishOnly": "npm run build && npm test",
+    "testprogs:build": "tsc -p testprogs/tsconfig.json",
+    "testprogs:run": "npm run testprogs:build && NODE_V8_COVERAGE=coverage node testprogs/dist/test1.js && NODE_V8_COVERAGE=coverage node testprogs/dist/test2.js && NODE_V8_COVERAGE=coverage node testprogs/dist/test3.js"
+  },
+  "keywords": [
+    "coverage",
+    "v8",
+    "highlight",
+    "testing"
+  ],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "source-map": "0.7.6"
+  },
+  "devDependencies": {
+    "@types/chai": "5.2.3",
+    "@types/mocha": "10.0.10",
+    "@types/node": "25.9.1",
+    "chai": "6.2.2",
+    "mocha": "11.7.5",
+    "source-map-support": "0.5.21",
+    "typescript": "6.0.3"
+  }
+}
