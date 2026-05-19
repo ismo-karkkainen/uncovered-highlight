@@ -160,23 +160,41 @@ class CoverageHighlightCli {
 
   private findCompiledJs(tsPath: string, outDirOption?: string): string | null {
     let outDir: string | null = outDirOption || null;
+    let rootDir: string | null = null;
+    let tsconfigDir: string | null = null;
 
     if (!outDir) {
-      outDir = this.findOutDirFromTsConfig(tsPath);
+      const configInfo = this.findTsConfigInfo(tsPath);
+      if (configInfo) {
+        outDir = configInfo.outDir;
+        rootDir = configInfo.rootDir;
+        tsconfigDir = configInfo.configDir;
+      }
     }
 
     if (!outDir) {
       return null;
     }
 
-    const tsDir = path.dirname(tsPath);
+    const absoluteTsPath = path.resolve(tsPath);
     const tsBasename = path.basename(tsPath, '.ts');
     const jsFilename = tsBasename + '.js';
 
-    const possiblePaths = [
-      path.join(outDir, jsFilename),
-      path.join(outDir, path.relative(tsDir, path.join(tsDir, jsFilename)))
-    ];
+    const possiblePaths: string[] = [];
+
+    if (rootDir && tsconfigDir) {
+      const absoluteRootDir = path.resolve(tsconfigDir, rootDir);
+      const relativeFromRoot = path.relative(absoluteRootDir, absoluteTsPath);
+      const relativeDir = path.dirname(relativeFromRoot);
+
+      if (!relativeFromRoot.startsWith('..')) {
+        possiblePaths.push(path.join(outDir, relativeDir, jsFilename));
+      }
+    }
+
+    const tsDir = path.dirname(absoluteTsPath);
+    possiblePaths.push(path.join(outDir, jsFilename));
+    possiblePaths.push(path.join(outDir, path.relative(tsDir, path.join(tsDir, jsFilename))));
 
     for (const possiblePath of possiblePaths) {
       if (fs.existsSync(possiblePath)) {
@@ -187,8 +205,8 @@ class CoverageHighlightCli {
     return null;
   }
 
-  private findOutDirFromTsConfig(tsPath: string): string | null {
-    let currentDir = path.dirname(tsPath);
+  private findTsConfigInfo(tsPath: string): { outDir: string; rootDir: string | null; configDir: string } | null {
+    let currentDir = path.dirname(path.resolve(tsPath));
 
     while (currentDir !== path.dirname(currentDir)) {
       const tsconfigPath = path.join(currentDir, 'tsconfig.json');
@@ -199,7 +217,12 @@ class CoverageHighlightCli {
           const config = JSON.parse(content);
 
           if (config.compilerOptions && config.compilerOptions.outDir) {
-            return path.resolve(currentDir, config.compilerOptions.outDir);
+            const outDir = path.resolve(currentDir, config.compilerOptions.outDir);
+            const rootDir = config.compilerOptions.rootDir
+              ? path.resolve(currentDir, config.compilerOptions.rootDir)
+              : null;
+
+            return { outDir, rootDir, configDir: currentDir };
           }
         } catch (error) {
           console.error(`Failed to parse tsconfig.json: ${tsconfigPath}`);

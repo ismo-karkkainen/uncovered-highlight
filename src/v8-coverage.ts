@@ -45,11 +45,26 @@ export class V8CoverageReader {
       throw new Error(`Coverage directory does not exist: ${coverageDir}`);
     }
 
-    const files = fs.readdirSync(coverageDir);
+    this.loadCoverageFromDir(coverageDir);
+
+    if (this.coverageData.length === 0) {
+      const subdirs = fs.readdirSync(coverageDir, { withFileTypes: true })
+        .filter(dirent => dirent.isDirectory())
+        .map(dirent => dirent.name);
+
+      for (const subdir of subdirs) {
+        const subdirPath = path.join(coverageDir, subdir);
+        this.loadCoverageFromDir(subdirPath);
+      }
+    }
+  }
+
+  private loadCoverageFromDir(dir: string): void {
+    const files = fs.readdirSync(dir);
     const coverageFiles = files.filter((f: string) => f.startsWith('coverage-') && f.endsWith('.json'));
 
     for (const file of coverageFiles) {
-      const filePath = path.join(coverageDir, file);
+      const filePath = path.join(dir, file);
       const content = fs.readFileSync(filePath, 'utf-8');
       const data: any = JSON.parse(content);
 

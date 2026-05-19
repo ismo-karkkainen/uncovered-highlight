@@ -1,0 +1,8 @@
+In some cases the coverage files are in a sub-directory under coverage. For 
+example, the example/coverage/tmp has the files that are wanted. For example
+c8 and other tools to report code coverage may add multiple subdirectories 
+based on arguments given by the user. The tool should look for the 
+sub-directory that has files with correct format.
+
+The following command does not seem to find the JavaScript source when run in example directory: node ../dist/cli.js --coverage-dir coverage/tmp src/callclasses.ts
+If tsconfig outDir is "pkg" but rootDir is "." then pkg/src/callclasses.js is the location of the file.

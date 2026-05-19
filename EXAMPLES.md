@@ -71,6 +71,13 @@ uncovered-highlight --line-numbers --show-omitted src/*.ts
 # But you can override it:
 uncovered-highlight --coverage-dir ./my-coverage src/myfile.ts
 
+# Works with subdirectories (e.g., c8 creates coverage/tmp/)
+uncovered-highlight --coverage-dir ./coverage/tmp src/myfile.ts
+
+# Auto-discovers coverage files in subdirectories
+# If coverage/ has no files, checks coverage/tmp/, coverage/data/, etc.
+uncovered-highlight src/myfile.ts
+
 # Specify custom TypeScript output directory
 uncovered-highlight --out-dir ./build src/myfile.ts
 
