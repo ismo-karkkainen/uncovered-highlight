@@ -15,40 +15,49 @@ NODE_V8_COVERAGE=coverage npm test
 ### View Coverage for a Single File
 
 ```bash
-# Basic usage (shows "..." for gaps by default)
+# Basic usage (line numbers shown by default, no "..." indicators)
 uncovered-highlight src/myfile.ts
 
-# With line numbers
-uncovered-highlight --line-numbers src/myfile.ts
+# Without line numbers
+uncovered-highlight -n src/myfile.ts
 
-# Disable "..." indicators
-uncovered-highlight --no-show-omitted src/myfile.ts
+# Show "..." indicators for omitted lines
+uncovered-highlight -s src/myfile.ts
 ```
 
 ### Adjust Context Lines
 
 ```bash
 # Show only uncovered lines (no context)
-uncovered-highlight --context 0 src/myfile.ts
+uncovered-highlight -x 0 src/myfile.ts
 
 # Show 1 line of context around uncovered code
-uncovered-highlight --context 1 src/myfile.ts
+uncovered-highlight -x 1 src/myfile.ts
 
 # Show 5 lines of context
-uncovered-highlight --context 5 src/myfile.ts
+uncovered-highlight -x 5 src/myfile.ts
 ```
 
-### Color Modes
+### Highlight Colors
 
 ```bash
-# Dark mode (default) - red text for uncovered code
+# Red highlighting (default)
 uncovered-highlight src/myfile.ts
 
-# Light mode - red text for uncovered code (same as dark)
-uncovered-highlight --color light src/myfile.ts
+# Bold text for uncovered code
+uncovered-highlight -h bold src/myfile.ts
 
-# Bold mode - bold text for uncovered code
-uncovered-highlight --color bold src/myfile.ts
+# Green highlighting
+uncovered-highlight -h green src/myfile.ts
+
+# Underline highlighting
+uncovered-highlight -h underline src/myfile.ts
+
+# Reverse video (swap foreground/background)
+uncovered-highlight -h reverse src/myfile.ts
+
+# Custom ANSI code (e.g., 35 = magenta)
+uncovered-highlight -h 35 src/myfile.ts
 ```
 
 ### Multiple Files
@@ -61,7 +70,7 @@ uncovered-highlight src/file1.ts src/file2.ts
 uncovered-highlight src/*.ts
 
 # Combine with options
-uncovered-highlight --line-numbers --show-omitted src/*.ts
+uncovered-highlight -s -h bold src/*.ts
 ```
 
 ### Custom Directories
@@ -69,20 +78,20 @@ uncovered-highlight --line-numbers --show-omitted src/*.ts
 ```bash
 # Coverage directory is auto-detected from source file location
 # But you can override it:
-uncovered-highlight --coverage-dir ./my-coverage src/myfile.ts
+uncovered-highlight -c ./my-coverage src/myfile.ts
 
 # Works with subdirectories (e.g., c8 creates coverage/tmp/)
-uncovered-highlight --coverage-dir ./coverage/tmp src/myfile.ts
+uncovered-highlight -c ./coverage/tmp src/myfile.ts
 
 # Auto-discovers coverage files in subdirectories
 # If coverage/ has no files, checks coverage/tmp/, coverage/data/, etc.
 uncovered-highlight src/myfile.ts
 
 # Specify custom TypeScript output directory
-uncovered-highlight --out-dir ./build src/myfile.ts
+uncovered-highlight -o ./build src/myfile.ts
 
 # Both together
-uncovered-highlight --coverage-dir ./cov --out-dir ./dist src/myfile.ts
+uncovered-highlight -c ./cov -o ./dist src/myfile.ts
 
 # Works from any directory - will find coverage/ or tsconfig.json in parent directories
 cd src/subdir && uncovered-highlight myfile.ts
@@ -217,8 +226,8 @@ Add to your `package.json`:
 {
   "scripts": {
     "test": "NODE_V8_COVERAGE=coverage mocha",
-    "coverage:show": "uncovered-highlight --line-numbers --show-omitted src/*.ts",
-    "coverage:report": "uncovered-highlight --context 0 src/*.ts | tee coverage-report.txt"
+    "coverage:show": "uncovered-highlight -s src/*.ts",
+    "coverage:report": "uncovered-highlight -x 0 src/*.ts | tee coverage-report.txt"
   }
 }
 ```
@@ -229,7 +238,7 @@ Add to your `package.json`:
 {
   "scripts": {
     "test": "NODE_V8_COVERAGE=coverage mocha",
-    "posttest": "uncovered-highlight --line-numbers src/**/*.ts"
+    "posttest": "uncovered-highlight src/**/*.ts"
   }
 }
 ```
@@ -249,5 +258,5 @@ jobs:
       - uses: actions/setup-node@v2
       - run: npm install
       - run: NODE_V8_COVERAGE=coverage npm test
-      - run: npx uncovered-highlight --line-numbers src/**/*.ts
+      - run: npx uncovered-highlight src/**/*.ts
 ```

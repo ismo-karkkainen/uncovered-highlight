@@ -83,25 +83,28 @@ Implemented in `src/cli.ts`:
 - Support for multiple files
 
 Options implemented:
-- `--coverage-dir <dir>`: Custom coverage directory
-- `--out-dir <dir>`: Override TypeScript output directory
-- `--line-numbers`: Prefix lines with line numbers
-- `--context <n>`: Context lines around uncovered code (default: 2)
-- `--show-omitted`: Show "..." for omitted line groups
-- `--color <mode>`: dark/light/bold color schemes
-- `-h, --help`: Usage information
+- `-c, --coverage-dir <dir>`: Custom coverage directory
+- `-o, --out-dir <dir>`: Override TypeScript output directory
+- `-n, --no-line-numbers`: Hide line numbers (shown by default)
+- `-x, --context <n>`: Context lines around uncovered code (default: 2)
+- `-s, --show-omitted`: Show "..." for omitted line groups
+- `-m, --hide-omitted`: Hide "..." for omitted line groups (default)
+- `-h, --highlight <color>`: Highlight color/style
+- `--help`: Usage information
 
-Color schemes:
-- **dark**: White text, bright red highlight (default)
-- **light**: Black text, red highlight
-- **bold**: Normal text, bold for uncovered
+Highlight colors:
+- **Named colors**: black, red (default), green, yellow, blue, magenta, cyan, white
+- **Styles**: bold, underline, reverse
+- **Numeric codes**: Any number for direct ANSI escape code (e.g., 35 for magenta)
 
 Features:
+- Line numbers shown by default
 - No line truncation (long lines displayed fully)
 - Terminal escape codes inserted inline
 - Multiple file support with file headers
 - Automatic tsconfig.json parsing
 - Works with both TypeScript and JavaScript files
+- Flexible color/style system
 
 ### 6. Documentation ✓
 
@@ -166,7 +169,7 @@ npm install uncovered-highlight
 
 ### Command-line:
 ```bash
-uncovered-highlight --line-numbers --show-omitted src/file.ts
+uncovered-highlight -s -h bold src/file.ts
 ```
 
 ### Programmatic:
@@ -197,10 +200,10 @@ import { V8CoverageReader, SourceMapProcessor, HighlightProcessor } from 'uncove
   - Greek: Αλφα
 
 ### Terminal Output
-- Uses ANSI escape codes for colors
+- Uses ANSI escape codes for colors and styles
 - Inline highlighting preserves line structure
 - No line truncation
-- Three color schemes (dark/light/bold)
+- Flexible highlight colors (named colors, styles, numeric codes)
 
 ## Dependencies
 
@@ -221,6 +224,19 @@ import { V8CoverageReader, SourceMapProcessor, HighlightProcessor } from 'uncove
 2. Source maps generated for all files
 3. Main library: `src/` → `dist/`
 4. Test programs: `testprogs/` → `testprogs/dist/`
+
+TypeScript Configuration:
+- Module system: `nodenext` (for Node.js compatibility)
+- Module resolution: `nodenext`
+- Target: ES2020
+
+### Development Scripts
+
+- `npm run build` - Compile TypeScript
+- `npm test` - Run test programs and test suite
+- `npm run clean` - Remove all build artifacts (dist, node_modules, coverage from main and testprogs)
+- `npm run testprogs:build` - Compile test programs only
+- `npm run testprogs:run` - Run test programs with coverage
 
 ## Verification
 

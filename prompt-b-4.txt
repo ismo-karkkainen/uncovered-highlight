@@ -1,0 +1,15 @@
+Change the display of line numbers to be the default. Change the line numbers argument to hide line numbers instead. Also add one-letter argument alternative to all parameters. Changing the name of the option to hide "..." for omitted lines.
+
+The .npmignore should ignore *.map, prompt*.txt, and all *.md files except README.md, which is included in any case.
+
+Since this tool is intended to be run at the developer's computer, in tsconfig.json change module and moduleResolution to nodenext.
+
+The "npm test" command should "npm run testprogs:run" before mocha to ensure the test data is present.
+
+Add a clean script that removes all dist, node_modules, and coverage directoriesfrom main directory and from testprogs.
+
+Highlight color should be color name (black, red, green, ..., white), bold, underline, or reverse to swap foreground and background colors. If the value starts with a number, the string value is used in the escape code as is.
+
+---
+
+Change the README.md, EXAMPLES.md, IMPLEMENTATION.md, and QUICKSTART.md to match the new command-line parameter names. Also check that current implementation matches the documentation.

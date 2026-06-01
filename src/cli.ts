@@ -6,39 +6,29 @@ import { V8CoverageReader } from './v8-coverage';
 import { SourceMapProcessor } from './source-map-processor';
 import { HighlightProcessor, LineHighlight } from './highlight-processor';
 
-interface ColorScheme {
-  text: string;
-  highlight: string;
-  reset: string;
-}
-
 interface CliOptions {
   coverageDir?: string;
   outDir?: string;
   showLineNumbers: boolean;
   contextLines: number;
   showOmitted: boolean;
-  colorMode: 'dark' | 'light' | 'bold';
+  highlightColor: string;
   files: string[];
 }
 
 class CoverageHighlightCli {
-  private colorSchemes: Record<string, ColorScheme> = {
-    dark: {
-      text: '\x1b[0m',
-      highlight: '\x1b[31m',
-      reset: '\x1b[0m'
-    },
-    light: {
-      text: '\x1b[0m',
-      highlight: '\x1b[31m',
-      reset: '\x1b[0m'
-    },
-    bold: {
-      text: '\x1b[0m',
-      highlight: '\x1b[1m',
-      reset: '\x1b[0m'
-    }
+  private colorCodes: Record<string, string> = {
+    black: '30',
+    red: '31',
+    green: '32',
+    yellow: '33',
+    blue: '34',
+    magenta: '35',
+    cyan: '36',
+    white: '37',
+    bold: '1',
+    underline: '4',
+    reverse: '7'
   };
 
   public async run(args: string[]): Promise<void> {
@@ -260,7 +250,7 @@ class CoverageHighlightCli {
       console.log(`\n=== ${filePath} ===\n`);
     }
 
-    const colorScheme = this.colorSchemes[options.colorMode];
+    const highlightCode = this.getHighlightCode(options.highlightColor);
     let lastLineNumber = 0;
 
     for (const line of lineHighlights) {
@@ -269,20 +259,33 @@ class CoverageHighlightCli {
       }
 
       const linePrefix = options.showLineNumbers ? `${line.lineNumber.toString().padStart(4)}  ` : '';
-      const highlighted = this.applyHighlights(line.lineContent, line.highlights, colorScheme);
+      const highlighted = this.applyHighlights(line.lineContent, line.highlights, highlightCode);
 
       console.log(linePrefix + highlighted);
       lastLineNumber = line.lineNumber;
     }
   }
 
+  private getHighlightCode(color: string): string {
+    if (/^\d/.test(color)) {
+      return `\x1b[${color}m`;
+    }
+    const code = this.colorCodes[color];
+    if (code) {
+      return `\x1b[${code}m`;
+    }
+    return '\x1b[31m';
+  }
+
   private applyHighlights(
     content: string,
     highlights: { start: number; end: number }[],
-    colorScheme: ColorScheme
+    highlightCode: string
   ): string {
+    const reset = '\x1b[0m';
+
     if (highlights.length === 0) {
-      return colorScheme.text + content + colorScheme.reset;
+      return content;
     }
 
     let result = '';
@@ -290,15 +293,15 @@ class CoverageHighlightCli {
 
     for (const highlight of highlights) {
       if (highlight.start > lastIndex) {
-        result += colorScheme.text + content.substring(lastIndex, highlight.start) + colorScheme.reset;
+        result += content.substring(lastIndex, highlight.start);
       }
 
-      result += colorScheme.highlight + content.substring(highlight.start, highlight.end) + colorScheme.reset;
+      result += highlightCode + content.substring(highlight.start, highlight.end) + reset;
       lastIndex = highlight.end;
     }
 
     if (lastIndex < content.length) {
-      result += colorScheme.text + content.substring(lastIndex) + colorScheme.reset;
+      result += content.substring(lastIndex);
     }
 
     return result;
@@ -306,37 +309,34 @@ class CoverageHighlightCli {
 
   private parseArgs(args: string[]): CliOptions {
     const options: CliOptions = {
-      showLineNumbers: false,
+      showLineNumbers: true,
       contextLines: 2,
-      showOmitted: true,
-      colorMode: 'dark',
+      showOmitted: false,
+      highlightColor: 'red',
       files: []
     };
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
 
-      if (arg === '--coverage-dir' && i + 1 < args.length) {
+      if (arg === '--coverage-dir' || arg === '-c' && i + 1 < args.length) {
         options.coverageDir = args[++i];
-      } else if (arg === '--out-dir' && i + 1 < args.length) {
+      } else if (arg === '--out-dir' || arg === '-o' && i + 1 < args.length) {
         options.outDir = args[++i];
-      } else if (arg === '--line-numbers') {
-        options.showLineNumbers = true;
-      } else if (arg === '--context' && i + 1 < args.length) {
+      } else if (arg === '--no-line-numbers' || arg === '-n') {
+        options.showLineNumbers = false;
+      } else if (arg === '--context' || arg === '-x' && i + 1 < args.length) {
         options.contextLines = parseInt(args[++i], 10);
-      } else if (arg === '--show-omitted') {
-        options.showOmitted = true;
-      } else if (arg === '--no-show-omitted') {
+      } else if (arg === '--hide-omitted' || arg === '-m') {
         options.showOmitted = false;
-      } else if (arg === '--color' && i + 1 < args.length) {
-        const mode = args[++i];
-        if (mode === 'dark' || mode === 'light' || mode === 'bold') {
-          options.colorMode = mode;
-        }
-      } else if (arg === '--help' || arg === '-h') {
+      } else if (arg === '--show-omitted' || arg === '-s') {
+        options.showOmitted = true;
+      } else if (arg === '--highlight' || arg === '-h' && i + 1 < args.length) {
+        options.highlightColor = args[++i];
+      } else if (arg === '--help') {
         this.showUsage();
         process.exit(0);
-      } else if (!arg.startsWith('--')) {
+      } else if (!arg.startsWith('--') && !arg.startsWith('-')) {
         options.files.push(arg);
       }
     }
@@ -349,20 +349,21 @@ class CoverageHighlightCli {
 Usage: uncovered-highlight [options] <file...>
 
 Options:
-  --coverage-dir <dir>   Coverage data directory (default: auto-detected)
-  --out-dir <dir>        TypeScript output directory (overrides tsconfig.json)
-  --line-numbers         Show line numbers
-  --context <n>          Number of context lines around uncovered code (default: 2)
-  --show-omitted         Show "..." for omitted lines (default: on)
-  --no-show-omitted      Disable showing "..." for omitted lines
-  --color <mode>         Color mode: dark (red text), light (red text), or bold (default: dark)
-  -h, --help             Show this help message
+  -c, --coverage-dir <dir>   Coverage data directory (default: auto-detected)
+  -o, --out-dir <dir>        TypeScript output directory (overrides tsconfig.json)
+  -n, --no-line-numbers      Hide line numbers (default: shown)
+  -x, --context <n>          Number of context lines around uncovered code (default: 2)
+  -s, --show-omitted         Show "..." for omitted lines
+  -m, --hide-omitted         Hide "..." for omitted lines (default)
+  -h, --highlight <color>    Highlight color: black, red, green, yellow, blue, magenta, cyan, white, bold, underline, reverse
+                             Or use numeric ANSI code (e.g., "31" for red) (default: red)
+  --help                     Show this help message
 
 Examples:
   uncovered-highlight src/file.ts
-  uncovered-highlight --line-numbers src/file.ts
-  uncovered-highlight --color bold --context 3 src/*.ts
-  uncovered-highlight --no-show-omitted src/file.ts
+  uncovered-highlight -n src/file.ts
+  uncovered-highlight -h bold -x 3 src/*.ts
+  uncovered-highlight -s src/file.ts
     `);
   }
 }

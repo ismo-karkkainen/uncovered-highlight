@@ -9,10 +9,11 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "mocha",
+    "test": "npm run testprogs:run && mocha",
     "prepublishOnly": "npm run build && npm test",
     "testprogs:build": "tsc -p testprogs/tsconfig.json",
-    "testprogs:run": "npm run testprogs:build && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test1.js && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test2.js && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test3.js"
+    "testprogs:run": "npm run testprogs:build && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test1.js && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test2.js && NODE_V8_COVERAGE=testprogs/coverage node testprogs/dist/test3.js",
+    "clean": "rm -rf dist node_modules coverage testprogs/dist testprogs/node_modules testprogs/coverage"
   },
   "keywords": [
     "coverage",

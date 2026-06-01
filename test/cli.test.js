@@ -31,17 +31,17 @@ describe('CLI', function() {
 
   it('should handle line numbers option', async function() {
     const test1Path = path.join(__dirname, '..', 'testprogs', 'test1.ts');
-    const args = ['--line-numbers', '--context', '0', test1Path];
+    const args = ['--context', '0', test1Path];
 
     await cli.run(args);
   });
 
-  it('should handle different color modes', async function() {
+  it('should handle different highlight colors', async function() {
     const test1Path = path.join(__dirname, '..', 'testprogs', 'test1.ts');
 
-    await cli.run(['--color', 'dark', '--context', '0', test1Path]);
-    await cli.run(['--color', 'light', '--context', '0', test1Path]);
-    await cli.run(['--color', 'bold', '--context', '0', test1Path]);
+    await cli.run(['--highlight', 'red', '--context', '0', test1Path]);
+    await cli.run(['--highlight', 'green', '--context', '0', test1Path]);
+    await cli.run(['--highlight', 'bold', '--context', '0', test1Path]);
   });
 
   it('should handle context setting', async function() {

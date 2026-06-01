@@ -23,17 +23,20 @@ npx uncovered-highlight src/your-file.ts
 ### 3. Customize (Optional)
 
 ```bash
-# With line numbers (omitted line markers are on by default)
-npx uncovered-highlight --line-numbers src/your-file.ts
+# Hide line numbers (line numbers shown by default)
+npx uncovered-highlight -n src/your-file.ts
 
-# Light color scheme (red text instead of default red text)
-npx uncovered-highlight --color light src/your-file.ts
+# Show omitted line markers ("..." for gaps)
+npx uncovered-highlight -s src/your-file.ts
 
 # Bold text instead of red
-npx uncovered-highlight --color bold src/your-file.ts
+npx uncovered-highlight -h bold src/your-file.ts
+
+# Green highlighting
+npx uncovered-highlight -h green src/your-file.ts
 
 # Only show uncovered lines (no context)
-npx uncovered-highlight --context 0 src/your-file.ts
+npx uncovered-highlight -x 0 src/your-file.ts
 
 # Multiple files
 npx uncovered-highlight src/*.ts
@@ -47,7 +50,7 @@ npx uncovered-highlight src/*.ts
 {
   "scripts": {
     "test": "NODE_V8_COVERAGE=coverage mocha",
-    "coverage": "uncovered-highlight --line-numbers src/**/*.ts"
+    "coverage": "uncovered-highlight src/**/*.ts"
   }
 }
 ```
@@ -61,7 +64,7 @@ npm test && npm run coverage
 
 ```bash
 NODE_V8_COVERAGE=coverage node my-script.js && \
-  uncovered-highlight --line-numbers --show-omitted my-script.js
+  uncovered-highlight -s my-script.js
 ```
 
 ### For TypeScript projects:
@@ -80,28 +83,29 @@ The tool automatically finds the compiled JavaScript and source maps!
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--coverage-dir <dir>` | Coverage data location | Auto-detected or `coverage` |
-| `--out-dir <dir>` | TypeScript output (overrides tsconfig) | From tsconfig.json |
-| `--line-numbers` | Show line numbers | Off |
-| `--context <n>` | Context lines around uncovered | `2` |
-| `--show-omitted` | Show "..." for gaps | On |
-| `--color <mode>` | `dark`, `light`, or `bold` | `dark` |
+| `-c, --coverage-dir <dir>` | Coverage data location | Auto-detected or `coverage` |
+| `-o, --out-dir <dir>` | TypeScript output (overrides tsconfig) | From tsconfig.json |
+| `-n, --no-line-numbers` | Hide line numbers | Line numbers shown |
+| `-x, --context <n>` | Context lines around uncovered | `2` |
+| `-s, --show-omitted` | Show "..." for gaps | Off |
+| `-m, --hide-omitted` | Hide "..." for gaps | On (default) |
+| `-h, --highlight <color>` | Color: black, red, green, yellow, blue, magenta, cyan, white, bold, underline, reverse, or numeric code | `red` |
 
 ## Troubleshooting
 
 **Coverage directory not found:**
 ```bash
-uncovered-highlight --coverage-dir ./my-coverage src/file.ts
+uncovered-highlight -c ./my-coverage src/file.ts
 ```
 
 **Can't find compiled JS:**
 ```bash
-uncovered-highlight --out-dir ./build src/file.ts
+uncovered-highlight -o ./build src/file.ts
 ```
 
 **Want to see everything:**
 ```bash
-uncovered-highlight --context 999 src/file.ts
+uncovered-highlight -x 999 src/file.ts
 ```
 
 ## Programmatic Usage

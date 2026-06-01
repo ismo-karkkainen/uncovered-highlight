@@ -36,34 +36,35 @@ uncovered-highlight [options] <file...>
 
 #### Options
 
-- `--coverage-dir <dir>` - Coverage data directory (default: auto-detected from source file path, or `coverage`)
-- `--out-dir <dir>` - TypeScript output directory (overrides tsconfig.json)
-- `--line-numbers` - Show line numbers before each line
-- `--context <n>` - Number of context lines around uncovered code (default: 2)
-- `--show-omitted` - Show "..." for omitted lines (default: enabled, use `--no-show-omitted` to disable)
-- `--color <mode>` - Color mode: `dark`, `light`, or `bold` (default: `dark`)
-- `-h, --help` - Show help message
+- `-c, --coverage-dir <dir>` - Coverage data directory (default: auto-detected from source file path, or `coverage`)
+- `-o, --out-dir <dir>` - TypeScript output directory (overrides tsconfig.json)
+- `-n, --no-line-numbers` - Hide line numbers (line numbers shown by default)
+- `-x, --context <n>` - Number of context lines around uncovered code (default: 2)
+- `-s, --show-omitted` - Show "..." for omitted lines
+- `-m, --hide-omitted` - Hide "..." for omitted lines (default)
+- `-h, --highlight <color>` - Highlight color: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `bold`, `underline`, `reverse`, or numeric ANSI code (default: `red`)
+- `--help` - Show help message
 
 #### Examples
 
-Display a TypeScript file with default settings:
+Display a TypeScript file with default settings (line numbers shown, red highlights):
 ```bash
 uncovered-highlight src/file.ts
 ```
 
-Show line numbers and omitted line indicators:
+Hide line numbers and show omitted line indicators:
 ```bash
-uncovered-highlight --line-numbers --show-omitted src/file.ts
+uncovered-highlight -n -s src/file.ts
 ```
 
-Use light color scheme with more context lines:
+Use bold highlighting with more context lines:
 ```bash
-uncovered-highlight --color light --context 3 src/file.ts
+uncovered-highlight -h bold -x 3 src/file.ts
 ```
 
 Process multiple files:
 ```bash
-uncovered-highlight --line-numbers src/*.ts
+uncovered-highlight src/*.ts
 ```
 
 ### Library API
@@ -108,7 +109,7 @@ processor.destroy();
 - **Source Map Support**: Maps JavaScript coverage back to TypeScript source files
 - **Smart Path Resolution**: Correctly handles `rootDir` and `outDir` configurations in tsconfig.json
 - **Multi-byte Character Support**: Correctly handles Unicode characters including emojis
-- **Flexible Highlighting**: Red text or bold text for uncovered code (dark/light modes use red text, bold mode uses bold text)
+- **Flexible Highlighting**: Customizable highlight colors including named colors (red, green, blue, etc.), styles (bold, underline, reverse), or numeric ANSI codes
 - **Context Control**: Show only relevant lines with configurable context
 - **Multiple Files**: Process multiple source files in a single run
 
@@ -118,7 +119,7 @@ processor.destroy();
 2. **Coverage Reading**: The tool reads the V8 coverage data from JSON files
 3. **Source Mapping**: For TypeScript files, coverage data is mapped back to the original source using source maps
 4. **Highlight Generation**: Uncovered code regions are identified and per-line highlight ranges are calculated
-5. **Terminal Output**: Source code is displayed with uncovered parts shown in red or bold text using ANSI color codes
+5. **Terminal Output**: Source code is displayed with uncovered parts highlighted using ANSI escape codes with customizable colors and styles
 6. **Auto-discovery**: Automatically searches for coverage directories and tsconfig.json from the source file location
 7. **Subdirectory Scanning**: If coverage directory has no files directly, automatically scans subdirectories (supports c8 and similar tools)
 
