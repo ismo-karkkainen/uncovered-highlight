@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "uncovered-highlight": "./dist/cli.js"
+    "uncovered-highlight": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
@@ -21,8 +21,9 @@
     "highlight",
     "testing"
   ],
-  "author": "",
-  "license": "UNLICENSED",
+  "author": "Claude Code",
+  "homepage": "https://github.com/ismo-karkkainen/uncovered-highlight#readme",
+  "license": "CC0-1.0",
   "dependencies": {
     "source-map": "0.7.6"
   },
