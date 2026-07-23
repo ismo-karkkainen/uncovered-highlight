@@ -1,0 +1,19 @@
+steps:
+- name: "$_REPO/cloud-sdk:latest"
+  entrypoint: "/usr/tool/prepare.sh"
+- name: "$_REPO/debian-node-24:latest"
+  entrypoint: "sh"
+  args: [ "-c", "$$PWD/test/cloudbuild.sh Debian $$PWD" ]
+- name: "$_REPO/debian-node-26:latest"
+  entrypoint: "sh"
+  args: [ "-c", "$$PWD/test/cloudbuild.sh Debian $$PWD" ]
+- name: "$_REPO/cloud-sdk:latest"
+  entrypoint: "/usr/tool/finish.sh"
+  args:
+  - "$REPO_NAME"
+  - "$BRANCH_NAME"
+  - "$_LOGS"
+timeout: "900s"
+options:
+  logging: CLOUD_LOGGING_ONLY
+
